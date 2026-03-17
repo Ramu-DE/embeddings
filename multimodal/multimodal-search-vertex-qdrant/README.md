@@ -207,18 +207,44 @@ The demo covers 12 scenarios: system init, text/image embedding, batch processin
 
 The `multimodal_embeddings` collection running on Qdrant Cloud with named vectors at all Matryoshka dimensions (dim_128 → dim_3072).
 
-### Collection View — Vector Graph
+### Vector Graph — Semantic Similarity Visualization
+
 ![Qdrant Collection](./assets/qdrant-collection.png)
 
+This is the Qdrant visual explorer showing the `multimodal_embeddings` collection as a **vector similarity graph**:
+
+- **Teal nodes** — individual embedding points (documents, images, etc.) stored in the collection
+- **Orange nodes** — cluster centroids or highly connected points that act as semantic hubs
+- **Purple ring** — the currently selected point being inspected
+- **Arrows** — directed edges showing nearest-neighbour relationships based on cosine similarity
+- The graph layout reflects the actual high-dimensional vector space — points that are **semantically similar cluster together**, while unrelated content spreads apart
+- This view confirms that our multimodal embeddings from Gemini Embedding 2 are forming meaningful semantic clusters across different content types
+
 ### Point Payload — Sample Record
+
 ![Qdrant Point Payload](./assets/qdrant-point-payload.png)
 
-Each point stores:
-- `content_type` — modality (text / image / audio / video / pdf)
-- `source_id` — original content identifier
-- `timestamp` — when it was indexed
-- `dimension` — Matryoshka dimension used (e.g. 756)
-- `model_version` — `gemini-embedding-2-preview`
+The right panel shows the **payload (metadata)** stored alongside each embedding vector. For point `df0f00b6-4a6e-4f15-961c-669c12240764`:
+
+```json
+{
+  "content_type": "text",
+  "source_id": "kb-infra-002",
+  "timestamp": "2026-03-16T08:29:21.045377+00:00",
+  "dimension": 756,
+  "model_version": "gemini-embedding-2-preview"
+}
+```
+
+| Field | Value | Description |
+|---|---|---|
+| `content_type` | `text` | This point is a text embedding |
+| `source_id` | `kb-infra-002` | Maps to the infrastructure knowledge base doc indexed in the RAG demo |
+| `timestamp` | `2026-03-16T08:29:21` | UTC time when this content was indexed |
+| `dimension` | `756` | Matryoshka dimension used — the default balanced dimension |
+| `model_version` | `gemini-embedding-2-preview` | Google Gemini Embedding 2 model that generated this vector |
+
+This metadata enables **filtered search** — e.g. retrieve only `text` points, or only points from a specific `source_id`, without scanning the entire collection.
 
 ---
 
