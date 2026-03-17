@@ -4,19 +4,19 @@ A structured knowledge base and collection of projects covering the full spectru
 
 ## Structure
 
-| Folder | Description | Reference |
+| Folder | Description | Code |
 |---|---|---|
-| [`fundamentals/`](./fundamentals/) | Core concepts: vector spaces, similarity metrics, distance functions | [What are Embeddings?](https://developers.google.com/machine-learning/crash-course/embeddings/video-lecture) |
-| [`models/`](./models/) | Embedding models — text, image, audio, multimodal | [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard) |
-| [`training/`](./training/) | Fine-tuning, contrastive learning, custom training pipelines | [Sentence Transformers Training](https://www.sbert.net/docs/training/overview.html) |
-| [`multimodal/`](./multimodal/) | Multimodal embedding projects and PoCs | [Vertex AI Multimodal Embeddings](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-multimodal-embeddings) |
-| [`vector_databases/`](./vector_databases/) | Qdrant, Pinecone, Weaviate, pgvector guides and examples | [Qdrant Docs](https://qdrant.tech/documentation/) |
-| [`retrieval/`](./retrieval/) | RAG, semantic search, hybrid retrieval patterns | [LangChain RAG](https://python.langchain.com/docs/tutorials/rag/) |
-| [`evaluation/`](./evaluation/) | Benchmarks, metrics, and evaluation frameworks | [BEIR Benchmark](https://github.com/beir-cellar/beir) |
-| [`production/`](./production/) | Deployment, scaling, monitoring embedding systems | [Qdrant Production Guide](https://qdrant.tech/documentation/guides/deployment/) |
-| [`advanced/`](./advanced/) | Quantization, matryoshka, late interaction, sparse-dense hybrid | [Matryoshka Embeddings](https://huggingface.co/blog/matryoshka) |
-| [`use_cases/`](./use_cases/) | End-to-end use case implementations | [Semantic Search Tutorial](https://www.pinecone.io/learn/semantic-search/) |
-| [`resources/`](./resources/) | Papers, links, and reference materials | [Awesome Embeddings](https://github.com/Hironsan/awesome-embedding-models) |
+| [`fundamentals/`](./fundamentals/) | Core concepts: vector spaces, similarity metrics, distance functions | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/fundamentals) |
+| [`models/`](./models/) | Embedding models — text, image, audio, multimodal | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/models) |
+| [`training/`](./training/) | Fine-tuning, contrastive learning, custom training pipelines | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/training) |
+| [`multimodal/`](./multimodal/) | Multimodal embedding projects and PoCs | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/multimodal) |
+| [`vector_databases/`](./vector_databases/) | Qdrant, Pinecone, Weaviate, pgvector guides and examples | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/vector_databases) |
+| [`retrieval/`](./retrieval/) | RAG, semantic search, hybrid retrieval patterns | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/retrieval) |
+| [`evaluation/`](./evaluation/) | Benchmarks, metrics, and evaluation frameworks | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/evaluation) |
+| [`production/`](./production/) | Deployment, scaling, monitoring embedding systems | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/production) |
+| [`advanced/`](./advanced/) | Quantization, matryoshka, late interaction, sparse-dense hybrid | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/advanced) |
+| [`use_cases/`](./use_cases/) | End-to-end use case implementations | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/use_cases) |
+| [`resources/`](./resources/) | Papers, links, and reference materials | [Browse](https://github.com/Ramu-DE/embeddings/tree/main/resources) |
 
 ## Projects
 
