@@ -203,6 +203,25 @@ The demo covers 12 scenarios: system init, text/image embedding, batch processin
 
 ---
 
+## Qdrant Vector DB — Live Collection
+
+The `multimodal_embeddings` collection running on Qdrant Cloud with named vectors at all Matryoshka dimensions (dim_128 → dim_3072).
+
+### Collection View — Vector Graph
+![Qdrant Collection](./assets/qdrant-collection.png)
+
+### Point Payload — Sample Record
+![Qdrant Point Payload](./assets/qdrant-point-payload.png)
+
+Each point stores:
+- `content_type` — modality (text / image / audio / video / pdf)
+- `source_id` — original content identifier
+- `timestamp` — when it was indexed
+- `dimension` — Matryoshka dimension used (e.g. 756)
+- `model_version` — `gemini-embedding-2-preview`
+
+---
+
 ## Use Cases Demonstrated
 
 - **Semantic search** across mixed-modality content libraries
