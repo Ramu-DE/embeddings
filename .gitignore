@@ -51,6 +51,9 @@ logs/
 .DS_Store
 Thumbs.db
 
+# Kiro IDE
+.kiro/
+
 # Credentials
 credentials.json
 *.pem
