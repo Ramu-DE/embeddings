@@ -205,26 +205,86 @@ The demo covers 12 scenarios: system init, text/image embedding, batch processin
 
 ## Qdrant Vector DB — Live Collection
 
-The `multimodal_embeddings` collection running on Qdrant Cloud with named vectors at all Matryoshka dimensions (dim_128 → dim_3072).
+The `multimodal_embeddings` collection running on Qdrant Cloud (sa-east-1) with **54 points** across multiple modalities, all embedded using `gemini-embedding-2-preview`.
+
+### Collection Stats (live data)
+
+| Metric | Value |
+|---|---|
+| Total points | 54 |
+| Collection | `multimodal_embeddings` |
+| Region | `sa-east-1-0.aws.cloud.qdrant.io` |
+| Default dimension | 756 (Matryoshka) |
+| Two-stage dimensions | dim_256 + dim_1024 |
+| Model | `gemini-embedding-2-preview` |
+
+### Content Breakdown
+
+| Content Type | Points | Source IDs |
+|---|---|---|
+| `text` | 50 | kb-*, ml-*, prod-*, ts-*, viz-text-* |
+| `image` | 2 | viz-image-001 |
+| `interleaved` | 2 | viz-interleaved-001 |
+
+### What's Indexed — by Source Group
+
+**Knowledge Base (RAG demo)** — 6 points at dim=756
+| Source ID | Content |
+|---|---|
+| `kb-hr-001` | Parental leave policy — 16 weeks paid leave for primary caregivers |
+| `kb-hr-002` | Learning & development budget — $2,000 annual per employee |
+| `kb-infra-001` | Production deployment policy — 2 approvals + passing CI required |
+| `kb-infra-002` | Database backup policy — every 6 hours, retained 30 days |
+| `kb-api-001` | API rate limit — 1,000 requests/minute per API key |
+| `kb-api-002` | Webhook retry policy — exponential backoff, up to 5 attempts |
+
+**Multilingual Search** — 8 points at dim=756
+| Source ID | Language | Content |
+|---|---|---|
+| `ml-en` | English | "The Eiffel Tower is a famous landmark in Paris." |
+| `ml-es` | Spanish | "La Torre Eiffel es un famoso monumento en París." |
+| `ml-fr` | French | "La Tour Eiffel est un monument célèbre à Paris." |
+| `ml-ja` | Japanese | "エッフェル塔はパリにある有名なランドマークです。" |
+
+**Product Recommendations** — 12 points at dim=756
+| Source ID | Content |
+|---|---|
+| `prod-001` | Sony WH-1000XM5 wireless noise-cancelling headphones |
+| `prod-002` | Bose QuietComfort 45 Bluetooth headphones |
+| `prod-003` | Apple AirPods Pro 2nd generation earbuds |
+| `prod-004` | Samsung Galaxy Buds2 Pro true wireless earbuds |
+| `prod-005` | Logitech MX Master 3 wireless ergonomic mouse |
+| `prod-006` | Apple Magic Keyboard with Touch ID |
+
+**Two-Stage Retrieval** — 10 points at dim=256+1024 (named vectors)
+| Source ID | Stored Dimensions |
+|---|---|
+| `ts-001` through `ts-005` | `dim_256` + `dim_1024` (dual named vectors per point) |
+
+**Visualization / Demo** — 9 points
+| Source ID | Type | Notes |
+|---|---|---|
+| `viz-text-001` to `viz-text-004` | text | Demo text documents |
+| `viz-image-001` | image | Stub JPEG — cross-modal search demo |
+| `viz-interleaved-001` | interleaved | Image + text caption unified embedding |
 
 ### Vector Graph — Semantic Similarity Visualization
 
 ![Qdrant Collection](./assets/qdrant-collection.png)
 
-This is the Qdrant visual explorer showing the `multimodal_embeddings` collection as a **vector similarity graph**:
+The Qdrant visual explorer shows the `multimodal_embeddings` collection as a **vector similarity graph**:
 
-- **Teal nodes** — individual embedding points (documents, images, etc.) stored in the collection
-- **Orange nodes** — cluster centroids or highly connected points that act as semantic hubs
-- **Purple ring** — the currently selected point being inspected
-- **Arrows** — directed edges showing nearest-neighbour relationships based on cosine similarity
-- The graph layout reflects the actual high-dimensional vector space — points that are **semantically similar cluster together**, while unrelated content spreads apart
-- This view confirms that our multimodal embeddings from Gemini Embedding 2 are forming meaningful semantic clusters across different content types
+- **Teal nodes** — individual embedding points stored in the collection
+- **Orange nodes** — highly connected semantic hub points (e.g. the RAG knowledge base docs cluster together)
+- **Purple ring** — the currently selected point (`kb-infra-002`)
+- **Arrows** — nearest-neighbour edges based on cosine similarity at dim=756
+- Points that are **semantically similar cluster together** — you can see the product recommendations, multilingual Eiffel Tower docs, and KB docs forming distinct clusters
 
 ### Point Payload — Sample Record
 
 ![Qdrant Point Payload](./assets/qdrant-point-payload.png)
 
-The right panel shows the **payload (metadata)** stored alongside each embedding vector. For point `df0f00b6-4a6e-4f15-961c-669c12240764`:
+The right panel shows the payload for point `df0f00b6-4a6e-4f15-961c-669c12240764` (`kb-infra-002`):
 
 ```json
 {
@@ -236,15 +296,7 @@ The right panel shows the **payload (metadata)** stored alongside each embedding
 }
 ```
 
-| Field | Value | Description |
-|---|---|---|
-| `content_type` | `text` | This point is a text embedding |
-| `source_id` | `kb-infra-002` | Maps to the infrastructure knowledge base doc indexed in the RAG demo |
-| `timestamp` | `2026-03-16T08:29:21` | UTC time when this content was indexed |
-| `dimension` | `756` | Matryoshka dimension used — the default balanced dimension |
-| `model_version` | `gemini-embedding-2-preview` | Google Gemini Embedding 2 model that generated this vector |
-
-This metadata enables **filtered search** — e.g. retrieve only `text` points, or only points from a specific `source_id`, without scanning the entire collection.
+This is the **database backup policy** document from the RAG knowledge base — *"Database backups run every 6 hours and are retained for 30 days."* — embedded at the default 756-dimension Matryoshka level.
 
 ---
 
