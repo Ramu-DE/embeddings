@@ -300,7 +300,122 @@ This is the **database backup policy** document from the RAG knowledge base — 
 
 ---
 
-## Use Cases Demonstrated
+## Charts — Live Performance Visualization
+
+All 8 charts below are generated live from real Gemini + Qdrant API calls via `visualize.py`.
+
+![Charts](./assets/charts.png)
+
+### Chart 1 — Matryoshka Dimensions (Vector L2 Norm vs Size)
+
+**What it shows:** The same text (`"A golden retriever playing fetch on a sunny beach."`) embedded at all 8 supported Matryoshka dimensions (128 → 3072).
+
+**Two metrics plotted:**
+- **Bars (purple)** — L2 norm of the embedding vector at each dimension. As dimension grows, the norm stabilizes, showing the vector space is well-calibrated across all sizes.
+- **Line (amber)** — API latency in ms per call. Latency stays relatively flat across dimensions because Gemini Embedding 2 generates the full 3072-dim vector once and truncates — no extra cost for smaller dimensions.
+
+**Key insight:** You can use dim=128 for fast approximate search and dim=3072 for maximum precision with no re-embedding needed.
+
+---
+
+### Chart 2 — Cross-Modal Search (Text Query → Mixed Results)
+
+**What it shows:** A text query `"dog playing on beach"` retrieving results across all modalities — text documents, images, and interleaved (image+caption) embeddings.
+
+**Flow:**
+1. Query text is embedded at dim=756
+2. Qdrant searches across ALL content types in the same vector space
+3. Results ranked by cosine similarity score
+
+**Color coding:** Blue = text, Orange = image, Purple = interleaved
+
+**Key insight:** The image (`viz-image-001`) and interleaved (`viz-interleaved-001`) points score competitively alongside text — proving the unified cross-modal vector space works. A text query finds images without any separate image search pipeline.
+
+---
+
+### Chart 3 — Multilingual Search Heatmap (Query Lang × Doc Lang)
+
+**What it shows:** A 4×4 similarity matrix. Each cell shows the cosine similarity score when querying in one language (rows: EN/ES/FR/JA) and retrieving a document in another language (columns: EN/ES/FR/JA). All 4 documents describe the same thing — the Eiffel Tower.
+
+**Flow:**
+1. Index 4 documents in EN, ES, FR, JA
+2. Query in each language
+3. Record similarity score for each query→doc pair
+
+**Key insight:** The diagonal (same language) scores are highest, but cross-language scores are also very high (0.8+). A Spanish query finds the English document and vice versa — no translation layer needed. Gemini Embedding 2 natively maps 100+ languages into the same semantic space.
+
+---
+
+### Chart 4 — Score Threshold (Result Count vs Minimum Similarity)
+
+**What it shows:** How many results are returned as the minimum similarity threshold increases from 0.0 to 0.9.
+
+**Flow:**
+1. Run the same query at each threshold value
+2. Qdrant filters out any result below the threshold
+3. Plot remaining result count
+
+**Key insight:** At threshold=0.0 all results are returned. As threshold rises, only high-confidence matches survive. This lets you tune precision vs recall — use 0.5+ for RAG to avoid hallucination from low-quality context, use 0.0 for broad discovery.
+
+---
+
+### Chart 5 — Two-Stage vs Single-Stage Latency
+
+**What it shows:** Average latency (ms) over 3 runs comparing three search strategies for the same query:
+- **Single dim=256** — fast but less accurate
+- **Single dim=1024** — accurate but slower
+- **Two-stage 256→1024** — fast candidate retrieval at dim=256, then accurate re-ranking at dim=1024
+
+**Flow:**
+1. Stage 1: embed query at dim=256, retrieve top-20 candidates from Qdrant
+2. Stage 2: embed query at dim=1024, re-rank only the 20 candidates
+3. Return top-5 final results
+
+**Key insight:** Two-stage achieves near-1024 accuracy while keeping latency closer to dim=256, because Stage 2 only re-ranks a small candidate set rather than scanning the full collection.
+
+---
+
+### Chart 6 — RAG Knowledge Base (Top-2 Retrieval Scores per Question)
+
+**What it shows:** For 3 enterprise questions, the top-2 most relevant KB documents retrieved and their similarity scores.
+
+**Questions asked:**
+- `"How much parental leave do employees get?"` → retrieves `kb-hr-001`, `kb-hr-002`
+- `"What is the deployment approval process?"` → retrieves `kb-infra-001`, `kb-infra-002`
+- `"What are the API rate limits?"` → retrieves `kb-api-001`, `kb-api-002`
+
+**Flow:**
+1. Index 6 KB documents at dim=756
+2. Embed each question and search with score_threshold=0.3
+3. Return top-2 results per question
+
+**Key insight:** The correct documents are retrieved with high confidence (0.8+). This is the foundation of a RAG pipeline — retrieve relevant context, then pass it to an LLM to generate a grounded answer.
+
+---
+
+### Chart 7 — Recommendation Engine (Similar Items to Seed Product)
+
+**What it shows:** Cosine similarity scores for 6 products when queried with the seed item `"Sony WH-1000XM5 wireless noise-cancelling headphones"`.
+
+**Flow:**
+1. Index 6 products (headphones, earbuds, mouse, keyboard) at dim=756
+2. Embed the seed query and search
+3. Rank by similarity score
+
+**Key insight:** Headphones and earbuds score highest (semantically similar — all audio devices), while the mouse and keyboard score lower (different category). The model understands product semantics without any category labels or structured metadata.
+
+---
+
+### Chart 8 — Batch Embedding Throughput (docs/sec by Dimension)
+
+**What it shows:** How many documents per second can be embedded in batch mode across different Matryoshka dimensions (128 → 1024).
+
+**Flow:**
+1. Prepare 5 text documents
+2. Call `embed_batch()` at each dimension, measure wall-clock time
+3. Calculate throughput = docs / elapsed_seconds
+
+**Key insight:** Throughput is largely consistent across dimensions because the API generates the full vector once and truncates. Lower dimensions don't give significantly higher throughput per call — the network round-trip dominates. For high-volume indexing, batching is the key optimization.
 
 - **Semantic search** across mixed-modality content libraries
 - **RAG (Retrieval-Augmented Generation)** — index enterprise docs, retrieve relevant context
