@@ -371,7 +371,14 @@ All 8 charts below are generated live from real Gemini + Qdrant API calls via `v
 2. Stage 2: embed query at dim=1024, re-rank only the 20 candidates
 3. Return top-5 final results
 
-**Key insight:** Two-stage achieves near-1024 accuracy while keeping latency closer to dim=256, because Stage 2 only re-ranks a small candidate set rather than scanning the full collection.
+**Why two-stage looks slower on this demo:** With only 54 documents, two-stage makes two API calls (dim=256 + dim=1024) while single-stage makes one — so it appears slower here. At scale (millions of docs), Stage 1 eliminates 99%+ of the collection before Stage 2 ever runs, making the total cost far lower than scanning everything at dim=1024.
+
+**Simple analogy — job interview shortlisting:**
+> A company receives 10,000 CVs. Instead of doing a full 1-hour interview with all 10,000 candidates, they do a quick 5-minute phone screen first and shortlist 50. Then only those 50 get the full interview. The total time is far less — even though each shortlisted candidate goes through two steps instead of one.
+
+Two-stage retrieval works the same way: dim=256 is the phone screen (fast, cheap, good enough to filter), dim=1024 is the full interview (accurate, but only run on the shortlist).
+
+**Key insight:** Two-stage achieves near-1024 accuracy while keeping latency closer to dim=256 at scale, because Stage 2 only re-ranks a small candidate set rather than scanning the full collection.
 
 ---
 
